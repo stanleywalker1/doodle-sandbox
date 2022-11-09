@@ -11,17 +11,36 @@ html, body {
   }
 
 .header {
-    width: 100%;
-    /* height: 10vh; */
-    display: flex;
-    flex-direction: row;
-    background-image: linear-gradient(#121c50a8, black);
-    
+   width: 100%;
+   display: flex;
+   flex-direction: row;
+   background-image: linear-gradient(#121c50a8, black);
+   justify-content: space-between;
+   align-items: center;
+   height: 7vh;
+}
+
+.fa_custom {
+   color: #d8dedf;
+   margin-right: 10px;
+}
+
+.footer {
+   height: 3vh;
+   background-image: linear-gradient(black, #121c50a8);
+}
+
+
+#personalweb a {
+   margin-left: 10px;
+   color: #d8dedfe3;
+   text-decoration: none;
+   border: groove;
+   font-family: Impact, Haettenschweiler, 'Arial Narrow', sans-serif;
 }
 
  #p5 {
     width: 100%;
-    /* width: 100vw; */
     height: 90vh;
     background-color: rgb(0, 0, 0);
  } 

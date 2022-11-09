@@ -7,27 +7,25 @@
 
 let nameInput, nameButton, greeting, startButton;
 var socket;
-let player;
-let playerName;
+let player, playerName, playerSize, playerSpeed;
 let pallete;
 let colorPicker;
-let playerSize;
-let playerSpeed;
+let players = [];
 let particles = [];
+let foods = [];
 let state = 0;
 let paint = 0;
-let v2;
-var b1, b2, c1, c2;
 let sketchHeight, sketchWidth;
-let img;
-let foods = [];
-
+let img, song;
+let studio, github;
 let canvas, playerLayer, drawingLayer, pixelLayer;
-let players = [];
+
 
 
 function preload() {
-  img = loadImage('media/agariomush.png');
+  img = loadImage('media/background.PNG');
+  song = loadSound("media/lowfi.mp3");
+
 }
 
 
@@ -37,42 +35,42 @@ function setup() {
   canvas = createCanvas(sketchWidth, sketchHeight);
   canvas.parent("p5");
   playerLayer = createGraphics(sketchWidth, sketchHeight);
- // playerLayer.parent("p5");
   drawingLayer = createGraphics(sketchWidth, sketchHeight);
-  //drawingLayer.parent("p5");
   pixelLayer = createGraphics(sketchWidth, sketchHeight);
- // pixelLayer.parent("p5");
+  studio = document.getElementById("personalweb");
+  github = document.getElementById("github");
 
   startPageLayout();
- //
- let online = document.getElementById("online");
+  
+  
 
-  socket = io.connect('https://doodle-sandbox.herokuapp.com');
+  // https for running online, local host for local 
+ // socket = io.connect('https://doodle-sandbox.herokuapp.com');
+  socket = io.connect('localhost:3000');
 
+  // details about player attributes 
   playerSize = 50;
   playerSpeed = 2.5;
   textGrow = 15;
   pallete = [color('#7400b8'), color('#e67e22'), color('#5e60ce'), color('#5390d9'), color('#4ea8de'), color('48bfe3,'), color('#56cfe1'), color('#64dfdf'), color('#72efdd'), color('#80ffdb')];
   colorPicker = random(pallete); 
 
+  // initializing a dummy player
   player = new human(width/2, height/2, playerSize, playerName, textGrow, colorPicker);
   
 
   noiseDetail(24); 
 
-  for (let i = 0; i <  500; i++){
+  // initializing the background particles
+  for (let i = 0; i <  2000; i++){
     let tempParticle = new Particle(random(width), random(height), 5, random(pallete));
     particles.push(tempParticle);
   }
 
+  // connecting server for paint values
   socket.on('paint', updateCanvas);
 
-  // socket.on('paint', data => {
-  //  // console.log("reading paint");
-	// 	drawingLayer.fill(255);
-  //   drawingLayer.ellipse(data.x, data.y, 10, 10);
-	// })
-
+  // sending server data about current client
   var data = {
     x: player.position.x,
     y: player.position.y,
@@ -81,6 +79,7 @@ function setup() {
    };
    socket.emit('start', data);
 
+   // throttle for the rate data is being sent to server
    socket.on('heartbeat', 
     function(data){
       players = data;
@@ -88,10 +87,8 @@ function setup() {
    );
  }
 
-
+ // updating paint canvas
  function updateCanvas(data){
- // console.log("x: " + data.x + "y: " + data.y);
-
   let food = new Food(data.x, data.y);
   food.display();
 }
@@ -101,74 +98,73 @@ function draw() {
     startPage();
   } else if (state == 1){
     gamePlay();
- //   startPage();
   }
 }
 
+// html elements for start page
 function startPageLayout(){
   startLayer = createGraphics(sketchWidth, sketchHeight);
-
   nameInput = createInput().attribute('placeholder', 'Enter a name');;
   nameInput.parent("startElements");
   nameInput.id("input");
- // nameInput.position(sketchWidth/2-nameInput.width/2, sketchHeight/2);
   let div = createDiv();
   div.parent('startElements');
   div.style('margin-left', '10px');
   nameButton = createButton('start');
   nameButton.parent(div);
   nameButton.id("start");
-  //nameButton.position(nameInput.x + nameInput.width + 50);
   nameButton.mousePressed(nameSent);
-
 }
 
+// p5 elements for start page
 function startPage(){
   background(50);
   img.resize(width, height);
   image(img, 0, 0);
 
   fill(255);
-  textSize(20);
+  textSize(40);
   textAlign(CENTER);
-  text('this is a game', width/2, height*0.4);
+  textFont('monospace');
+  text('DOODLE SANDBOX', width/2, height*0.4);
 
-  text('this is how the game works its really so so amazing you can draw stuff with ur friends'
+  textSize(20);
+  text('This is a multiplayer drawing canvas experiment that lets you roam and paint with friends'
         , width/2, height*0.8);
 
-}
+  text('- Hold space bar to paint and interact with the pixels around you -'
+  , width/2, height*0.85);
 
+        
+
+}
+// when start button is pressed, switch to game state and play song
 function nameSent(){
   playerName = nameInput.value();
- // nameInput.value('');
   player = new human(width/2, height/2, playerSize, playerName, textGrow, colorPicker);
   state = 1;
+  song.play();
+  song.loop();
 }
 
 function gamePlay(){
- // sketchWidth = document.getElementById("p5").offsetWidth;
- // sketchHeight = document.getElementById("p5").offsetHeight;
   nameInput.remove();
   nameButton.remove();
-
+  studio.remove();
+  github.remove();
 
   background(0);
-  //orbitControl();
   
- 
- // ellipse(player.position.x, player.position.y, 40, 40);
   translate(width/2-player.position.x, height/2-player.position.y);
   
   for(let i = particles.length -1; i >= 0; i--){
     particles[i].playMove();
     particles[i].display();
   }
-
+  // checking to see if the server is trying to re-render myself, without this there will be x2 versions of your player
   for(let i = players.length -1; i >= 0; i--){
     var id = players[i].id;
-   // var id = players[i].name;
     if(id !== socket.id){
-     // console.log("id is not itself");
       fill(colorPicker); 
       ellipse(players[i].x, players[i].y, playerSize, playerSize);
 
@@ -182,21 +178,6 @@ function gamePlay(){
   player.display(); 
   player.move();
   player.paint();
- 
-  
-  // wrap around
-  // if(player.position.x < -width){
-  //   player.position.x = width*2;
-  // } 
-  // else if(player.position.x > width*2){
-  //   player.position.x = 0;
-  // }
-  // if(player.position.y < -height){
-  //   player.position.y = height*2;
-  // } 
-  // else if(player.position.y > height*2){
-  //   player.position.y = 0;
-  //  } 
 
    if(player.position.x < 0){
     player.position.x = width;
@@ -212,7 +193,7 @@ function gamePlay(){
    } 
 
 
-  //. console.log('Sending Human data');
+  // sending data in real time about your player to update the server and other clients 
 
     var data = {
       x: player.position.x,
@@ -221,7 +202,8 @@ function gamePlay(){
       name: player.name
     };
     socket.emit('update', data);
-
+    
+    //trying to fix buffers on window resize, ignore
     // image(pixelLayer, 0, 0, sketchWidth, 0);
     // image(drawingLayer, 0, 0, sketchWidth, 0);
     // image(playerLayer, 0, 0, sketchWidth, 0);
@@ -239,7 +221,7 @@ function gamePlay(){
 }
 
 
-
+// class for each player
 class human {
   constructor(x, y, size, name, textGrow, color){
     this.x = x;
@@ -259,7 +241,6 @@ class human {
   
     display(){
       playerLayer.fill(this.color);
-    //  console.log(this.color); sometimes the player is white for no reason?
       playerLayer.ellipse(this.position.x, this.position.y, this.size, this.size);
       playerLayer.textSize(this.textGrow);
       playerLayer.fill(255);
@@ -270,66 +251,38 @@ class human {
     paint(){
       let x = this.position.x;
       let y = this.position.y;
-
-
-      for(let i=foods.length-1;i>0;i--){
-        let d = dist(foods[i].x, foods[i].y, particles[i].x, particles[i].y);
-        // line(foods[i].x, foods[i].y, particles[i].x, particles[i].y);
-        if (d < 50) {
-          particles[i].x = lerp(particles[i].x, foods[i].x, 0.1);
-          particles[i].y = lerp(particles[i].y, foods[i].y, 0.1);
-        } 
-      }
      
-
-     
-
       if(keyIsDown(32)){
        
       push();
-  
-      // drawingLayer.noStroke();
-      // drawingLayer.fill(lineColor);
-
-      // drawingLayer.ellipse(x, y, 10, 10);
-
       let food = new Food(x, y);
       foods.push(food);
       food.display();
-
-      // try making an ellipse object so that the pixels move towards the color lines
-      
      
       pop();
       var data = {
         x: x,
         y: y
        }
-   
        socket.emit('paint', data); 
        
       }
-      
     }
   }
-
+// class for the background particle
   class Particle {
     constructor(x, y, size, color) {
       this.x = x;
       this.y = y;
-  
       this.size = size;
       this.color = color;
-  
       this.xOffset = random(0, 1000);
       this.yOffset = random(1000, 2000);
-    
     }
   
     display(){
       pixelLayer.noStroke();
       pixelLayer.fill(this.color, 100);
-      //glow(color(255), 8);
       pixelLayer.rect(this.x, this.y, this.size, this.size);
 
       push();
@@ -349,20 +302,6 @@ class human {
       this.x += xMovement;
       this.y += yMovement;
   
-      // handle wrap-around
-      // if (this.x > width*2) {
-      //   this.x = 0;
-      // }
-      // else if (this.x < -width) {
-      //   this.x = width*2;
-      // }
-      // if (this.y > height*2) {
-      //   this.y = 0;
-      // }
-      // else if (this.y < -height) {
-      //   this.y = height*2;
-      // }
-
       if (this.x > width) {
         this.x = 0;
       }
@@ -376,16 +315,13 @@ class human {
         this.y = height;
       }
 
-    
-   
-  
         // update our noise offset values
         this.xOffset += 0.01;
         this.yOffset += 0.01;
     }
   }
 
-
+// class for the paint, i wanted to make it into food for the particles, hence the name; this will come soon
   class Food {
     constructor(x, y){
       this.x = x;
@@ -394,39 +330,52 @@ class human {
     display(){
        // gradient code adapted from https://happycoding.io/tutorials/p5js/for-loops/vertical-gradient
 
-
       const m = 100;
-
       const topR = 255 * noise(frameCount / m);
       const topG = 255 * noise(1000 + frameCount / m);
       const topB = 255 * noise(2000 + frameCount / m);
       const bottomR = 255 * noise(3000 + frameCount / m);
       const bottomG = 255 * noise(4000  + frameCount / m);
       const bottomB = 255 * noise(5000 + frameCount / m);
-
       const topColor = color(topR, topG, topB);
       const bottomColor = color(bottomR, bottomG, bottomB);
-      
       const lineColor = lerpColor(topColor, bottomColor, 1);
+
       drawingLayer.noStroke();
       drawingLayer.fill(lineColor);
-
       drawingLayer.ellipse(this.x, this.y, 10, 10);
 
+      for(let i=particles.length-1;i>0;i--){
+        let d = dist(this.x, this.y, particles[i].x, particles[i].y);
+        fill(255);
+        stroke(255);
+        
+        if (d < 80) {
+        //  line(this.x, this.y, particles[i].x, particles[i].y);
+          particles[i].x = lerp(particles[i].x, this.x, 0.1);
+          particles[i].y = lerp(particles[i].y, this.y, 0.1);
+          //trying to keep particles attracted to paint trials, ignore
+          // particles[i].x = constrain(this.x, particles[i].x, particles[i].x+20);
+          // particles[i].y = constrain(this.y, particles[i].y, particles[i].y+20);
+       }
+     }
     }
   }
 
   function windowResized() {
-    sketchWidth = document.getElementById("p5").offsetWidth;
+   sketchWidth = document.getElementById("p5").offsetWidth;
    sketchHeight = document.getElementById("p5").offsetHeight;
  
     canvas.resize(sketchWidth, sketchHeight);
+
+    //trying to fix buffers on window resize, ignore
     // playerLayer.size(sketchWidth, sketchHeight);
     // drawingLayer.size(sketchWidth, sketchHeight);
     // pixelLayer.size(sketchWidth, sketchHeight);
     // startLayer.size(sketchWidth, sketchHeight);
 }
 
+// stop space bar from moving the page down
 window.onkeydown = function(e) { 
   return !(e.keyCode == 32);
 };
