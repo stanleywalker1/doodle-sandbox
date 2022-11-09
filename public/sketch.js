@@ -1,9 +1,10 @@
-// Why is the server player display spotty?
-  // 
-// painting feature while keeping the background fixed
-// How to have paint orgin trail behind human
+// QUESTIONS TO ASK
+// when you resize one of the buffer does not follow suite, player starts moving in the dark 
+// preformence with food
+// online counter
+// cursur not ??
+//  sometimes the player is white for no reason?
 
-// use css for moblie debugging 
 let nameInput, nameButton, greeting, startButton;
 var socket;
 let player;
@@ -19,13 +20,11 @@ let v2;
 var b1, b2, c1, c2;
 let sketchHeight, sketchWidth;
 let img;
+let foods = [];
 
-
-
-let currentLayer;
 let canvas, playerLayer, drawingLayer, pixelLayer;
 let players = [];
-// let id;
+
 
 function preload() {
   img = loadImage('media/agariomush.png');
@@ -43,19 +42,12 @@ function setup() {
   //drawingLayer.parent("p5");
   pixelLayer = createGraphics(sketchWidth, sketchHeight);
  // pixelLayer.parent("p5");
-  currentLayer = playerLayer;
+
   startPageLayout();
  //
  let online = document.getElementById("online");
 
-
-
-  // createCanvas(500,500);
-  // background(0, 200, 200);
-
   socket = io.connect('http://localhost:3000');
- // socket.on('player', playerJoining);
-
 
   playerSize = 50;
   playerSpeed = 2.5;
@@ -63,24 +55,23 @@ function setup() {
   pallete = [color('#7400b8'), color('#e67e22'), color('#5e60ce'), color('#5390d9'), color('#4ea8de'), color('48bfe3,'), color('#56cfe1'), color('#64dfdf'), color('#72efdd'), color('#80ffdb')];
   colorPicker = random(pallete); 
 
-  console.log(colorPicker)
   player = new human(width/2, height/2, playerSize, playerName, textGrow, colorPicker);
   
 
   noiseDetail(24); 
 
-  for (let i = 0; i <  100; i++){
+  for (let i = 0; i <  500; i++){
     let tempParticle = new Particle(random(width), random(height), 5, random(pallete));
     particles.push(tempParticle);
   }
 
-  //socket.on('paint', updateCanvas);
+  socket.on('paint', updateCanvas);
 
-  socket.on('paint', data => {
-    console.log("reading paint");
-		drawingLayer.fill(255);
-    drawingLayer.ellipse(data.x, data.y, 10, 10);
-	})
+  // socket.on('paint', data => {
+  //  // console.log("reading paint");
+	// 	drawingLayer.fill(255);
+  //   drawingLayer.ellipse(data.x, data.y, 10, 10);
+	// })
 
   var data = {
     x: player.position.x,
@@ -100,22 +91,9 @@ function setup() {
 
  function updateCanvas(data){
  // console.log("x: " + data.x + "y: " + data.y);
-  // const m = 100;
 
-  // const topR = 255 * noise(frameCount / m);
-  // const topG = 255 * noise(1000 + frameCount / m);
-  // const topB = 255 * noise(2000 + frameCount / m);
-  // const bottomR = 255 * noise(3000 + frameCount / m);
-  // const bottomG = 255 * noise(4000  + frameCount / m);
-  // const bottomB = 255 * noise(5000 + frameCount / m);
-
-  // const topColor = color(topR, topG, topB);
-  // const bottomColor = color(bottomR, bottomG, bottomB);
-  
-  // const lineColor = lerpColor(topColor, bottomColor, 1);
-  noStroke();
-  fill(255);
-  ellipse(data.x, data.y, 10, 10);
+  let food = new Food(data.x, data.y);
+  food.display();
 }
 
 function draw() {
@@ -146,24 +124,9 @@ function startPageLayout(){
 }
 
 function startPage(){
-  // if(startButton.mousePressed()){
-  //   state = 1;
-  // } else {
-  //   state = 0;
-  // }
-
-  // startLayer.background(50);
-
-  // startLayer.fill(255);
-  // startLayer.textSize(20);
-  // startLayer.textAlign(CENTER);
-  // startLayer.text('this is a game', width/2, height/2);
-  
   background(50);
   img.resize(width, height);
   image(img, 0, 0);
-
-  
 
   fill(255);
   textSize(20);
@@ -177,11 +140,9 @@ function startPage(){
 
 function nameSent(){
   playerName = nameInput.value();
-  // greeting.html('hello ' + name + '!');
  // nameInput.value('');
- player = new human(width/2, height/2, playerSize, playerName, textGrow, colorPicker);
+  player = new human(width/2, height/2, playerSize, playerName, textGrow, colorPicker);
   state = 1;
- // return name;
 }
 
 function gamePlay(){
@@ -224,31 +185,31 @@ function gamePlay(){
  
   
   // wrap around
-  if(player.position.x < -width){
-    player.position.x = width*2;
+  // if(player.position.x < -width){
+  //   player.position.x = width*2;
+  // } 
+  // else if(player.position.x > width*2){
+  //   player.position.x = 0;
+  // }
+  // if(player.position.y < -height){
+  //   player.position.y = height*2;
+  // } 
+  // else if(player.position.y > height*2){
+  //   player.position.y = 0;
+  //  } 
+
+   if(player.position.x < 0){
+    player.position.x = width;
   } 
-  else if(player.position.x > width*2){
+  else if(player.position.x > width){
     player.position.x = 0;
   }
-  if(player.position.y < -height){
-    player.position.y = height*2;
+  if(player.position.y < 0){
+    player.position.y = height;
   } 
-  else if(player.position.y > height*2){
+  else if(player.position.y > height){
     player.position.y = 0;
    } 
-
-  //  if (this.x > width*2) {
-  //   this.x = 0;
-  // }
-  // else if (this.x < -width) {
-  //   this.x = width*2;
-  // }
-  // if (this.y > height*2) {
-  //   this.y = 0;
-  // }
-  // else if (this.y < -height) {
-  //   this.y = height*2;
-  // }
 
 
   //. console.log('Sending Human data');
@@ -268,8 +229,7 @@ function gamePlay(){
     // rotateX(frameCount * 0.01);
     // rotateY(frameCount * 0.01);
   
-    
-    //box(50);
+  
     image(pixelLayer, 0, 0);
     image(drawingLayer, 0, 0);
     image(playerLayer, 0, 0);
@@ -298,7 +258,6 @@ class human {
   }
   
     display(){
-    //  console.log(this.name);
       playerLayer.fill(this.color);
     //  console.log(this.color); sometimes the player is white for no reason?
       playerLayer.ellipse(this.position.x, this.position.y, this.size, this.size);
@@ -312,30 +271,33 @@ class human {
       let x = this.position.x;
       let y = this.position.y;
 
-      // gradient code adapted from https://happycoding.io/tutorials/p5js/for-loops/vertical-gradient
 
-      const m = 100;
+      for(let i=foods.length-1;i>0;i--){
+        let d = dist(foods[i].x, foods[i].y, particles[i].x, particles[i].y);
+        // line(foods[i].x, foods[i].y, particles[i].x, particles[i].y);
+        if (d < 50) {
+          particles[i].x = lerp(particles[i].x, foods[i].x, 0.1);
+          particles[i].y = lerp(particles[i].y, foods[i].y, 0.1);
+        } 
+      }
+     
 
-      const topR = 255 * noise(frameCount / m);
-      const topG = 255 * noise(1000 + frameCount / m);
-      const topB = 255 * noise(2000 + frameCount / m);
-      const bottomR = 255 * noise(3000 + frameCount / m);
-      const bottomG = 255 * noise(4000  + frameCount / m);
-      const bottomB = 255 * noise(5000 + frameCount / m);
-
-      const topColor = color(topR, topG, topB);
-      const bottomColor = color(bottomR, bottomG, bottomB);
-      
-      const lineColor = lerpColor(topColor, bottomColor, 1);
+     
 
       if(keyIsDown(32)){
        
       push();
   
-      drawingLayer.noStroke();
-      drawingLayer.fill(lineColor);
+      // drawingLayer.noStroke();
+      // drawingLayer.fill(lineColor);
 
-      drawingLayer.ellipse(x, y, 10, 10);
+      // drawingLayer.ellipse(x, y, 10, 10);
+
+      let food = new Food(x, y);
+      foods.push(food);
+      food.display();
+
+      // try making an ellipse object so that the pixels move towards the color lines
       
      
       pop();
@@ -388,22 +350,69 @@ class human {
       this.y += yMovement;
   
       // handle wrap-around
-      if (this.x > width*2) {
+      // if (this.x > width*2) {
+      //   this.x = 0;
+      // }
+      // else if (this.x < -width) {
+      //   this.x = width*2;
+      // }
+      // if (this.y > height*2) {
+      //   this.y = 0;
+      // }
+      // else if (this.y < -height) {
+      //   this.y = height*2;
+      // }
+
+      if (this.x > width) {
         this.x = 0;
       }
-      else if (this.x < -width) {
-        this.x = width*2;
+      else if (this.x < 0) {
+        this.x = width;
       }
-      if (this.y > height*2) {
+      if (this.y > height) {
         this.y = 0;
       }
-      else if (this.y < -height) {
-        this.y = height*2;
+      else if (this.y < 0) {
+        this.y = height;
       }
+
+    
+   
   
         // update our noise offset values
         this.xOffset += 0.01;
         this.yOffset += 0.01;
+    }
+  }
+
+
+  class Food {
+    constructor(x, y){
+      this.x = x;
+      this.y = y;
+    }
+    display(){
+       // gradient code adapted from https://happycoding.io/tutorials/p5js/for-loops/vertical-gradient
+
+
+      const m = 100;
+
+      const topR = 255 * noise(frameCount / m);
+      const topG = 255 * noise(1000 + frameCount / m);
+      const topB = 255 * noise(2000 + frameCount / m);
+      const bottomR = 255 * noise(3000 + frameCount / m);
+      const bottomG = 255 * noise(4000  + frameCount / m);
+      const bottomB = 255 * noise(5000 + frameCount / m);
+
+      const topColor = color(topR, topG, topB);
+      const bottomColor = color(bottomR, bottomG, bottomB);
+      
+      const lineColor = lerpColor(topColor, bottomColor, 1);
+      drawingLayer.noStroke();
+      drawingLayer.fill(lineColor);
+
+      drawingLayer.ellipse(this.x, this.y, 10, 10);
+
     }
   }
 
