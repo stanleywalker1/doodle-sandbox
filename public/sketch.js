@@ -47,7 +47,7 @@ function setup() {
  //
  let online = document.getElementById("online");
 
-  socket = io.connect('http://localhost:3000');
+  socket = io.connect('https://doodle-sandbox.herokuapp.com');
 
   playerSize = 50;
   playerSpeed = 2.5;
