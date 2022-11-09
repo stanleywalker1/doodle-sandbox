@@ -45,8 +45,8 @@ function setup() {
   
 
   // https for running online, local host for local 
- // socket = io.connect('https://doodle-sandbox.herokuapp.com');
-  socket = io.connect('localhost:3000');
+  socket = io.connect('https://doodle-sandbox.herokuapp.com');
+//  socket = io.connect('localhost:3000');
 
   // details about player attributes 
   playerSize = 50;
