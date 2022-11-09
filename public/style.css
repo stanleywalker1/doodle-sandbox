@@ -1,0 +1,64 @@
+html {
+   cursor:none;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+  }
+  canvas {
+    display: block;
+  }
+
+.header {
+    width: 100%;
+    /* height: 10vh; */
+    display: flex;
+    flex-direction: row;
+}
+
+ #p5 {
+    width: 100%;
+    /* width: 100vw; */
+    height: 90vh;
+    background-color: aquamarine;
+ } 
+
+ #startElements {
+    position: absolute;
+    width: 100%;
+    height: 90vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+ }
+
+ #input {
+    border: inset;
+    width: 300px;
+    height: 30px;
+    border-radius: 10px;
+    border-color: dodgerblue;
+ }
+
+ #start {
+    font-family: system-ui;
+    border-radius: 10px;
+    border: double;
+    width: 70px;
+    height: 30px;
+    border-color: dodgerblue;
+ }
+
+ #online {
+   /* background-color: black; */
+   border-color: aquamarine;
+ }
+
+
+ .small{
+   width: 6px;
+   height: 6px;
+   border: 2px solid #fff;
+   border-radius: 50%;
+ }
