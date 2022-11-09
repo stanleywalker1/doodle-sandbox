@@ -62,7 +62,7 @@ function setup() {
   noiseDetail(24); 
 
   // initializing the background particles
-  for (let i = 0; i <  2000; i++){
+  for (let i = 0; i <  800; i++){
     let tempParticle = new Particle(random(width), random(height), 5, random(pallete));
     particles.push(tempParticle);
   }
