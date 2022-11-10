@@ -1,10 +1,3 @@
-// QUESTIONS TO ASK
-// when you resize one of the buffer does not follow suite, player starts moving in the dark 
-// preformence with food
-// online counter
-// cursur not ??
-//  sometimes the player is white for no reason?
-
 let nameInput, nameButton, greeting, startButton;
 var socket;
 let player, playerName, playerSize, playerSpeed;
@@ -20,7 +13,6 @@ let img, song, test;
 let studio, github, info;
 let canvas, playerLayer, drawingLayer, pixelLayer;
 let mobileButton;
-
 
 
 function preload() {
