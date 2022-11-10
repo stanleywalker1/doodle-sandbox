@@ -52,6 +52,7 @@ html, body {
     display: flex;
     align-items: center;
     justify-content: center;
+    z-index: 2;
  }
 
  #input {
@@ -60,6 +61,7 @@ html, body {
     height: 30px;
     border-radius: 10px;
     border-color: dodgerblue;
+      
  }
 
  #start {
@@ -75,6 +77,26 @@ html, body {
    /* background-color: black; */
    border-color: aquamarine;
  }
+ #info {
+   color: white;
+   font-size: 16px;
+   font-family: monospace;
+   font-weight: 300;
+   padding-left: 20px;
+   padding-right: 20px;
+
+ }
+ #infoContainter{
+   display: flex;
+   position: absolute;
+   width: 100%;
+   height: 75vh;
+   flex-direction: column;
+   justify-content: flex-end;
+   align-items: center;
+   
+ }
+
 
 
  .small{

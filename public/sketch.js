@@ -16,15 +16,18 @@ let foods = [];
 let state = 0;
 let paint = 0;
 let sketchHeight, sketchWidth;
-let img, song;
-let studio, github;
+let img, song, test;
+let studio, github, info;
 let canvas, playerLayer, drawingLayer, pixelLayer;
+let mobileButton;
 
 
 
 function preload() {
   img = loadImage('media/background.PNG');
   song = loadSound("media/lowfi.mp3");
+  test = loadImage('media/test.png');
+
 
 }
 
@@ -39,8 +42,16 @@ function setup() {
   pixelLayer = createGraphics(sketchWidth, sketchHeight);
   studio = document.getElementById("personalweb");
   github = document.getElementById("github");
+  info = document.getElementById("infoContainter");
+
+ 
+  
 
   startPageLayout();
+
+  mobileButton = new Button(width/2-20, height-100, test);
+
+ 
   
   
 
@@ -98,7 +109,12 @@ function draw() {
     startPage();
   } else if (state == 1){
     gamePlay();
-  }
+  } 
+  // working on mobile 
+  if (window.matchMedia("(max-width: 767px)").matches) {
+    mobileButton.display();
+   // test.mousePressed(changeBG);
+  } 
 }
 
 // html elements for start page
@@ -127,16 +143,6 @@ function startPage(){
   textAlign(CENTER);
   textFont('monospace');
   text('DOODLE SANDBOX', width/2, height*0.4);
-
-  textSize(20);
-  text('This is a multiplayer drawing canvas experiment that lets you roam and paint with friends'
-        , width/2, height*0.8);
-
-  text('- Hold space bar to paint and interact with the pixels around you -'
-  , width/2, height*0.85);
-
-        
-
 }
 // when start button is pressed, switch to game state and play song
 function nameSent(){
@@ -152,6 +158,7 @@ function gamePlay(){
   nameButton.remove();
   studio.remove();
   github.remove();
+  info.remove();
 
   background(0);
   
@@ -267,6 +274,7 @@ class human {
        socket.emit('paint', data); 
        
       }
+
     }
   }
 // class for the background particle
@@ -345,6 +353,7 @@ class human {
       drawingLayer.fill(lineColor);
       drawingLayer.ellipse(this.x, this.y, 10, 10);
 
+      if(keyIsDown(38) || keyIsDown(87)){
       for(let i=particles.length-1;i>0;i--){
         let d = dist(this.x, this.y, particles[i].x, particles[i].y);
         fill(255);
@@ -360,6 +369,7 @@ class human {
        }
      }
     }
+    }
   }
 
   function windowResized() {
@@ -368,11 +378,13 @@ class human {
  
     canvas.resize(sketchWidth, sketchHeight);
 
+   
     //trying to fix buffers on window resize, ignore
     // playerLayer.size(sketchWidth, sketchHeight);
     // drawingLayer.size(sketchWidth, sketchHeight);
     // pixelLayer.size(sketchWidth, sketchHeight);
     // startLayer.size(sketchWidth, sketchHeight);
+  
 }
 
 // stop space bar from moving the page down
@@ -380,5 +392,49 @@ window.onkeydown = function(e) {
   return !(e.keyCode == 32);
 };
 
+
+  // nameButton.parent(div);
+  // nameButton.id("start");
+  // nameButton.mousePressed(nameSent);
+//let link = document.querySelector(".theme-btn.btn-style-four");
+
+
+
+function changeBG() {
+console.log('pressed');
+}
+
+class Button {
+  // adapted from here: https://editor.p5js.org/kjhollen/sketches/dHOoxK_hD
+  
+  constructor(inX, inY, inImg) {
+    this.x = inX;
+    this.y = inY;
+    this.img = inImg;
+  }
+
+  display() {
+    stroke(0);
+    
+    // tint the image on mouse hover
+    if (this.over()) {
+      tint(204, 0, 128);
+    } else {
+      noTint();
+    }
+    
+    image(this.img, this.x, this.y);
+  }
+  
+  // over automatically matches the width & height of the image read from the file
+  // see this.img.width and this.img.height below
+  over() {
+    if (mouseX > this.x && mouseX < this.x + this.img.width && mouseY > this.y && mouseY < this.y + this.img.height) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+}
 
 
